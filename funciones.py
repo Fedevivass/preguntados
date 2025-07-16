@@ -191,14 +191,14 @@ def verificar_correcta(pregunta_actual:dict,respuesta:int)->bool:
     bool
         True si la respuesta es correcta, False si es incorrecta.
     """
-    if pregunta_actual["respuesta_correcta"] == respuesta:
+    if int(pregunta_actual["respuesta_correcta"]) == respuesta:
         retorno = True
     else:
         retorno = False
 
     return retorno
 
-def verificar_respuesta(datos_juego:dict,pregunta_actual:dict,respuesta:int) -> bool:
+def verificar_respuesta(datos_juego:dict,pregunta_actual:dict,respuesta:int,comodin_x2:dict,comodin_doble:dict) -> bool:
     """
     Verifica si la respuesta seleccionada es correcta y actualiza los datos del juego
     según el resultado (puntaje, racha, vidas y tiempo).
@@ -220,16 +220,27 @@ def verificar_respuesta(datos_juego:dict,pregunta_actual:dict,respuesta:int) -> 
     bool
         True si la respuesta fue correcta, False si fue incorrecta.
     """
-    if pregunta_actual["respuesta_correcta"] == respuesta:
-        datos_juego["puntuacion"] += PUNTUACION_ACIERTO
-        datos_juego["racha"] += 1
+    if int(pregunta_actual["respuesta_correcta"]) == respuesta:
+        if comodin_x2["usado"] == True:
+            datos_juego["puntuacion"] += PUNTUACION_COMODIN
+            datos_juego["racha"] += 1
+            comodin_x2["usado"] = False
+        else:
+            datos_juego["puntuacion"] += PUNTUACION_ACIERTO
+            datos_juego["racha"] += 1
         if datos_juego["racha"] == 5:
             datos_juego["vidas"] += 1
             datos_juego["tiempo_restante"] += 15
         retorno = True
     else:
-        datos_juego["puntuacion"] -= PUNTUACION_ERROR
-        datos_juego["vidas"] -= 1
+        if comodin_doble["usado"] == False:
+            datos_juego["puntuacion"] -= PUNTUACION_ERROR
+            datos_juego["vidas"] -= 0
+            datos_juego["racha"] = 0
+        else:
+            datos_juego["puntuacion"] = datos_juego["puntuacion"]
+            datos_juego["vidas"] = datos_juego["vidas"]
+        
         retorno = False
         
     return retorno
@@ -301,76 +312,38 @@ def mezclar_lista(lista_preguntas:list) -> None:
     """
     random.shuffle(lista_preguntas)
 
-def guardar_puntuacion(puntos:int,nombre:str,nombre_archivo:str)-> dict|list:
-    """
-    Guarda la puntuación y el nombre del jugador en un archivo JSON llamado "partidas.json".
-    Si el archivo no existe o está vacío, crea una nueva lista para almacenar las puntuaciones.
-
-    Parámetros
-    puntos : int
-        Puntuación obtenida por el jugador.
-    nombre : str
-        Nombre del jugador.
-
-    Retorna
-    dict | list
-        Lista actualizada con todas las puntuaciones guardadas.
-    """
-    datos = {"Puntuacion": puntos, "Nombre": nombre}
+def guardar_puntuacion(jugadores:dict,nombre_archivo:str)-> dict|list:
     if os.path.exists(nombre_archivo) == True:
         with open(nombre_archivo, "r") as archivo:
                 puntuaciones = json.load(archivo)
     else:
         puntuaciones = []
 
-    puntuaciones.append(datos)  
+    puntuaciones.append(jugadores)  
     
     with open(nombre_archivo, "w") as archivo:
         json.dump(puntuaciones, archivo, indent=4)
 
     return puntuaciones
+ 
+def ordenar_listas_diccionarios(lista:list,clave:str,criterio:bool = True)->None:
+    if type(criterio) != bool:
+        criterio = True
 
-def ordenar_jugadores(lista:list):
-    """
-    Ordena la lista de jugadores (o puntuaciones) en orden descendente
-    usando un algoritmo de selección o burbuja simple.
+    for izq in range(len(lista) - 1):
+        for der in range(izq + 1,len(lista)):
+            dato_izq = lista[izq].get(clave,0)
+            dato_der = lista[der].get(clave,0)
+            if (criterio == True and dato_izq > dato_der) or (criterio == False and dato_izq < dato_der):
+                aux_izq = lista[izq]
+                lista[izq] = lista[der]
+                lista[der] = aux_izq
 
-    Parámetros
-    lista : list
-        Lista de números (por ejemplo, puntuaciones) que se desea ordenar.
+def crear_lista(nombre_archivo:str):
+    with open(nombre_archivo, "r") as archivo:
+        lista_jugadores = json.load(archivo)
 
-    Retorna
-    None
-        La función modifica la lista original directamente.
-    """
-    for izq in range(len(lista)-1):
-        for der in range((izq + 1), len(lista)):
-            numero_izq = lista[izq]
-            numero_der = lista[der]
-
-        if numero_izq < numero_der:
-            intercambiar_elementos(lista, izq, der)
-
-def intercambiar_elementos(array: list, izq: int, der: int) -> None:
-    """
-    Intercambia los elementos en las posiciones `izq` y `der` dentro de la lista `array`.
-
-    Parámetros
-    array : list
-        Lista donde se realizará el intercambio.
-    izq : int
-        Índice del primer elemento a intercambiar.
-    der : int
-        Índice del segundo elemento a intercambiar.
-
-    Retorna
-    None
-        Modifica la lista `array` directamente.
-    """
-    auxilar = array[izq]
-    array[izq] = array[der]
-    array[der] = auxilar
-
+    return lista_jugadores
 def crear_pregunta(linea:str,separador:str=",")-> dict:
     linea = linea[0:len(linea)-1]
     lista_datos = linea.split(separador)
@@ -398,5 +371,9 @@ def leer_csv(nombre_archivo:str,lista:list,separador:str= ",")->bool:
     
     return retorno
 
+lista_preguntas = []
 
-        
+leer_csv("preguntas.csv",lista_preguntas)
+
+
+

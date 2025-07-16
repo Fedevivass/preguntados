@@ -6,7 +6,7 @@ pygame.init()
 
 boton_volver = crear_elemento_juego("atras.png",50,40,10,10)
 
-def mostrar_rankings(pantalla:pygame.Surface,cola_eventos:list[pygame.event.Event],lista_rankings:list) -> str:
+def mostrar_rankings(pantalla:pygame.Surface,cola_eventos:list[pygame.event.Event]) -> str:
     retorno = "rankings"
     
     fondo_pantalla = pygame.transform.scale(pygame.image.load("fondo.jpg"),PANTALLA)
@@ -23,15 +23,20 @@ def mostrar_rankings(pantalla:pygame.Surface,cola_eventos:list[pygame.event.Even
                     CLICK_SONIDO.play()
                     retorno = "menu"
     
-    ordenar_jugadores(lista_rankings)
     pantalla.blit(fondo_pantalla,(0,0))
 
+    lista_jugadores = crear_lista("partida.json")
+
+    ordenar_listas_diccionarios(lista_jugadores,"Puntuacion",False)
     
     pantalla.blit(boton_volver["superficie"],boton_volver["rectangulo"])
-    if len(lista_rankings) > 0 and len(lista_rankings) <= 10:
-        mostrar_texto(pantalla,f"{lista_rankings} PUNTOS\n",(50,50),FUENTE_RANKING,COLOR_NEGRO)
-    else:
-        mostrar_texto(pantalla,"NINGUN JUGADOR REGISTRADO",(50,50),FUENTE_RANKING,COLOR_NEGRO)
+    y = 120
+    for i in range(0,len(lista_jugadores)):
+        jugador = lista_jugadores[i]
+        texto = f"{i + 1}. {jugador['Nombre']} - {jugador['Puntuacion']} pts - {jugador['Tiempo_final']}"
+        superficie_texto = FUENTE_RANKING.render(texto, True, COLOR_NEGRO)
+        pantalla.blit(superficie_texto, (250, y))
+        y += 40
 
     return retorno
     

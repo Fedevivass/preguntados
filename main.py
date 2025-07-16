@@ -5,7 +5,6 @@ from Juego import *
 from configuracion import *
 from ranking import *
 from terminado import *
-from Preguntas import *
 
 pygame.init()
 pygame.display.set_caption("PREGUNTADOS")
@@ -16,12 +15,11 @@ pantalla = pygame.display.set_mode(PANTALLA)
 corriendo = True
 datos_juego = {"puntuacion":0,"vidas":3,"nombre":"","tiempo_restante":TIEMPO_JUEGO,"volumen_musica":0,"indice":0,"racha":0}
 
-lista_puntuaciones = []
 reloj = pygame.time.Clock()
 ventana_actual = "menu"
 
 bandera_juego = False
-
+jugadores = {}
 while corriendo:
     reloj.tick(FPS)
     cola_eventos = pygame.event.get()
@@ -31,7 +29,7 @@ while corriendo:
     elif ventana_actual == "salir":
         corriendo = False
     elif ventana_actual == "rankings":
-        ventana_actual = mostrar_rankings(pantalla,cola_eventos,lista_puntuaciones)
+        ventana_actual = mostrar_rankings(pantalla,cola_eventos)
     elif ventana_actual == "ajustes":
         ventana_actual = mostrar_ajustes(pantalla,cola_eventos,datos_juego)
     elif ventana_actual == "juego":
@@ -42,14 +40,12 @@ while corriendo:
             pygame.mixer.music.set_volume(porcentaje_musica)
             pygame.mixer.music.play(-1)
             bandera_juego = True
-        ventana_actual = mostrar_juego(pantalla,cola_eventos,datos_juego,lista_preguntas,0)
+        ventana_actual = mostrar_juego(pantalla,cola_eventos,datos_juego,lista_preguntas)
     elif ventana_actual == "terminado":
         if bandera_juego == True:
             bandera_juego = False
             pygame.mixer.music.stop()
-        ventana_actual = mostrar_fin_juego(pantalla,cola_eventos,datos_juego,lista_puntuaciones)
+        ventana_actual = mostrar_fin_juego(pantalla,cola_eventos,datos_juego,jugadores)
 
-    
-    
     pygame.display.flip()
 pygame.quit()

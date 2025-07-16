@@ -9,7 +9,7 @@ cuadro = crear_elemento_juego("textura_respuesta.jpg",250,50,200,200)
 guardado = crear_elemento_juego("textura_respuesta.jpg",200,50,200,300)
 fondo_pantalla = pygame.transform.scale(pygame.image.load("fondo.jpg"),PANTALLA)
 
-def mostrar_fin_juego(pantalla:pygame.Surface,cola_eventos:list[pygame.event.Event],datos_juego:dict,lista_rankings:list) -> str:
+def mostrar_fin_juego(pantalla:pygame.Surface,cola_eventos:list[pygame.event.Event],datos_juego:dict,jugadores:dict) -> str:
     retorno = "terminado"
     
     for evento in cola_eventos:
@@ -37,9 +37,11 @@ def mostrar_fin_juego(pantalla:pygame.Surface,cola_eventos:list[pygame.event.Eve
         elif evento.type == pygame.MOUSEBUTTONDOWN:
             if evento.button == 1:
                 if guardado["rectangulo"].collidepoint(evento.pos):
-                    guardar_puntuacion(datos_juego["puntuacion"],datos_juego["nombre"],"partida.json")
-                    lista_rankings.append(datos_juego["puntuacion"])
-                    ordenar_jugadores(lista_rankings)
+                    jugadores["Nombre"] = datos_juego["nombre"]
+                    jugadores["Puntuacion"] = datos_juego["puntuacion"]
+                    jugadores["Tiempo_final"] = datos_juego["tiempo_restante"]
+                    guardar_puntuacion(jugadores,"partida.json")
+
                     reiniciar_estadisticas(datos_juego)
                     retorno = "menu"
                     

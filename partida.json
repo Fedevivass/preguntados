@@ -1,18 +1,32 @@
 [
     {
-        "Puntuacion": 225,
-        "Nombre": ""
-    },
-    {
-        "Puntuacion": -75,
-        "Nombre": "FEFE"
-    },
-    {
-        "Puntuacion": -75,
-        "Nombre": "FEDE"
-    },
-    {
+        "Nombre": "FEDE",
         "Puntuacion": 25,
-        "Nombre": "FEDEDEDEDE"
+        "Tiempo_final": 29
+    },
+    {
+        "Nombre": "JORGE",
+        "Puntuacion": 625,
+        "Tiempo_final": 27
+    },
+    {
+        "Nombre": "GEE",
+        "Puntuacion": 325,
+        "Tiempo_final": 26
+    },
+    {
+        "Nombre": "FEDEDE",
+        "Puntuacion": 325,
+        "Tiempo_final": 26
+    },
+    {
+        "Nombre": "",
+        "Puntuacion": 25,
+        "Tiempo_final": 26
+    },
+    {
+        "Nombre": "FEDE",
+        "Puntuacion": 125,
+        "Tiempo_final": 28
     }
 ]
