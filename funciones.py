@@ -245,7 +245,7 @@ def verificar_respuesta(datos_juego:dict,pregunta_actual:dict,respuesta:int,como
         
     return retorno
 
-def reiniciar_estadisticas(datos_juego:dict):
+def reiniciar_estadisticas(datos_juego:dict) -> None:
     """
     Reinicia los valores principales del estado del juego al comenzar
     una nueva partida.
@@ -312,7 +312,25 @@ def mezclar_lista(lista_preguntas:list) -> None:
     """
     random.shuffle(lista_preguntas)
 
-def guardar_puntuacion(jugadores:dict,nombre_archivo:str)-> dict|list:
+def guardar_puntuacion(jugadores: dict, nombre_archivo: str) -> dict | list:
+    """
+    Guarda una nueva puntuación (representada como un diccionario) en un archivo JSON que contiene una lista de puntuaciones.
+
+    Parámetros:
+    - jugadores (dict): diccionario con los datos de un jugador o una puntuación a agregar.
+    - nombre_archivo (str): ruta o nombre del archivo JSON donde se almacenan las puntuaciones.
+
+    Funcionamiento:
+    - Verifica si el archivo existe:
+        - Si existe, lo abre en modo lectura y carga la lista actual de puntuaciones.
+        - Si no existe, crea una lista vacía para almacenar las puntuaciones.
+    - Agrega el diccionario `jugadores` al final de la lista.
+    - Abre el archivo en modo escritura y guarda la lista actualizada en formato JSON, con indentación para mejor lectura.
+    - Retorna la lista actualizada de puntuaciones.
+
+    Retorna:
+    - La lista completa de puntuaciones actualizada, que puede estar vacía si se crea por primera vez.
+    """
     if os.path.exists(nombre_archivo) == True:
         with open(nombre_archivo, "r") as archivo:
                 puntuaciones = json.load(archivo)
@@ -326,7 +344,28 @@ def guardar_puntuacion(jugadores:dict,nombre_archivo:str)-> dict|list:
 
     return puntuaciones
  
-def ordenar_listas_diccionarios(lista:list,clave:str,criterio:bool = True)->None:
+def ordenar_listas_diccionarios(lista: list, clave: str, criterio: bool = True) -> None:
+    """
+    Ordena una lista de diccionarios in-place basándose en el valor asociado a una clave específica.
+
+    Parámetros:
+    - lista (list): lista de diccionarios a ordenar.
+    - clave (str): clave del diccionario cuyo valor se utilizará para la comparación y ordenamiento.
+    - criterio (bool, opcional): determina el sentido del ordenamiento.
+        - True para ordenar de menor a mayor (orden ascendente).
+        - False para ordenar de mayor a menor (orden descendente).
+      Por defecto es True.
+
+    Funcionamiento:
+    - Valida que el parámetro 'criterio' sea booleano; si no, lo establece en True.
+    - Utiliza un algoritmo de ordenamiento tipo burbuja (doble ciclo for).
+    - Compara los valores asociados a la clave especificada en dos diccionarios diferentes.
+    - Si el orden es incorrecto según el criterio, intercambia las posiciones de los diccionarios en la lista.
+    - Modifica la lista original sin retornar nada (ordenamiento in-place).
+
+    Nota:
+    - Si la clave no existe en un diccionario, se considera su valor como 0 para la comparación.
+    """
     if type(criterio) != bool:
         criterio = True
 
@@ -339,12 +378,49 @@ def ordenar_listas_diccionarios(lista:list,clave:str,criterio:bool = True)->None
                 lista[izq] = lista[der]
                 lista[der] = aux_izq
 
-def crear_lista(nombre_archivo:str):
+def crear_lista(nombre_archivo:str)->list:
+    """
+    Carga y devuelve una lista de jugadores almacenada en un archivo JSON.
+
+    Parámetros:
+    - nombre_archivo (str): ruta o nombre del archivo JSON que contiene la lista de jugadores.
+
+    Funcionamiento:
+    - Abre el archivo en modo lectura.
+    - Usa json.load para cargar los datos del archivo, que deben ser una lista.
+    - Devuelve la lista cargada.
+
+    Retorna:
+    - Una lista con los jugadores almacenados en el archivo JSON.
+    """
     with open(nombre_archivo, "r") as archivo:
         lista_jugadores = json.load(archivo)
 
     return lista_jugadores
-def crear_pregunta(linea:str,separador:str=",")-> dict:
+
+def crear_pregunta(linea: str, separador: str = ",") -> dict:
+    """
+    Convierte una línea de texto de un archivo CSV en un diccionario que representa una pregunta.
+
+    Parámetros:
+    - linea (str): línea del archivo CSV que contiene los datos de una pregunta y sus respuestas.
+    - separador (str, opcional): carácter que separa los campos en la línea (por defecto es la coma ',').
+
+    Funcionamiento:
+    - Elimina el salto de línea final de la línea recibida (último carácter).
+    - Separa la línea en una lista de valores usando el separador.
+    - Crea un diccionario con las claves:
+        "pregunta"            : texto de la pregunta (primer campo).
+        "respuesta_1"         : texto de la primera respuesta (segundo campo).
+        "respuesta_2"         : texto de la segunda respuesta (tercer campo).
+        "respuesta_3"         : texto de la tercera respuesta (cuarto campo).
+        "respuesta_4"         : texto de la cuarta respuesta (quinto campo).
+        "respuesta_correcta"  : texto que indica cuál es la respuesta correcta (sexto campo).
+    - Devuelve el diccionario con la información de la pregunta y sus respuestas.
+
+    Retorna:
+    - Un diccionario con los datos de la pregunta y sus respuestas.
+    """
     linea = linea[0:len(linea)-1]
     lista_datos = linea.split(separador)
     pregunta = {}
@@ -357,7 +433,28 @@ def crear_pregunta(linea:str,separador:str=",")-> dict:
 
     return pregunta
 
-def leer_csv(nombre_archivo:str,lista:list,separador:str= ",")->bool:
+def leer_csv(nombre_archivo:str, lista:list, separador:str = ",") -> bool:
+    """
+    Lee un archivo CSV y carga sus datos en una lista de diccionarios.
+
+    Parámetros:
+    - nombre_archivo (str): nombre o ruta del archivo CSV a leer.
+    - lista (list): lista donde se almacenarán los diccionarios creados a partir de cada línea del archivo.
+    - separador (str, opcional): carácter que separa los campos en el CSV (por defecto es la coma ',').
+
+    Funcionamiento:
+    - Verifica si el archivo existe en la ruta indicada.
+    - Si existe, lo abre en modo lectura con codificación UTF-8.
+    - Omite la primera línea del archivo (normalmente el encabezado).
+    - Recorre cada línea restante del archivo, llama a la función `crear_pregunta` 
+    para convertir la línea en un diccionario usando el separador indicado.
+    - Añade cada diccionario resultante a la lista proporcionada.
+    - Cierra el archivo automáticamente al salir del bloque `with`.
+
+    Retorno:
+    - Devuelve True si el archivo fue leído y procesado correctamente.
+    - Devuelve False si el archivo no existe.
+    """
     if os.path.exists(nombre_archivo) == True:
         with open(nombre_archivo,"r",encoding="utf-8") as archivo:
             archivo.readline()
